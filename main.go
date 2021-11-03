@@ -90,6 +90,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&databasecontroller.DatabaseMetricsReconciler{
+		KubeClient: mgr.GetClient(),
+		Log:        ctrl.Log.WithName("controllers").WithName("database").WithName("DatabaseMetrics"),
+		Scheme:     mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "DatabaseMetrics")
+		os.Exit(1)
+	}
 	if err = (&databasecontroller.AutonomousDatabaseReconciler{
 		KubeClient: mgr.GetClient(),
 		Log:        ctrl.Log.WithName("controllers").WithName("database").WithName("AutonomousDatabase"),

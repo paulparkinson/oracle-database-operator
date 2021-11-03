@@ -17,6 +17,11 @@ spec:
       kind: AutonomousDatabase
       name: autonomousdatabases.database.oracle.com
       version: v1alpha1
+    - description: DatabaseMetrics is the Schema for the autonomousdatabases API
+      displayName: DatabaseMetrics
+      kind: DatabaseMetrics
+      name: databasemetrics.database.oracle.com
+      version: v1alpha1
   description: Operator to manage Oracle sharding
   displayName: Oracle Sharding DB Operator
   icon:

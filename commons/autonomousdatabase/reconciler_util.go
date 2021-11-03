@@ -42,6 +42,8 @@ import (
 	"context"
 	"fmt"
 
+	appsv1 "k8s.io/api/apps/v1"
+	apiv1 "k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -123,5 +125,79 @@ func CreateWalletSecret(logger logr.Logger, kubeClient client.Client, dbClient d
 		return err
 	}
 	logger.Info(fmt.Sprintf("Wallet is stored in the Secret %s", *walletName))
+	return nil
+}
+
+// to get secret refer to https://github.com/kubernetes-sigs/controller-runtime/blob/0a3dd2a36dd971ea2fdcb163b0457e6be0d315bd/pkg/client/example_test.go#L57
+func CreateTestSecret(logger logr.Logger, kubeClient client.Client, namespacedName types.NamespacedName, data map[string][]byte) error {
+
+	stringData := map[string]string{}
+	for key, val := range data {
+		stringData[key] = string(val)
+	}
+
+	testSecret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: namespacedName.Namespace,
+			Name:      namespacedName.Name,
+		},
+		StringData: stringData,
+	}
+
+	if err := kubeClient.Create(context.TODO(), testSecret); err != nil {
+		return err
+	}
+	logger.Info(fmt.Sprintf("Test Secret created %s", namespacedName.Name))
+	return nil
+}
+
+// https://github.com/kubernetes/client-go/blob/master/examples/create-update-delete-deployment/main.go
+func CreateTestDeployment(logger logr.Logger, kubeClient client.Client, namespacedName types.NamespacedName, data map[string][]byte) error {
+
+	// deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
+
+	deployment := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: namespacedName.Namespace,
+			Name:      "demo-deployment",
+		},
+		Spec: appsv1.DeploymentSpec{
+			// Replicas: int32Ptr(2),
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": "demo",
+				},
+			},
+			Template: apiv1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						"app": "demo",
+					},
+				},
+				Spec: apiv1.PodSpec{
+					Containers: []apiv1.Container{
+						{
+							Name:  "web",
+							Image: "nginx:1.12",
+							Ports: []apiv1.ContainerPort{
+								{
+									Name:          "http",
+									Protocol:      apiv1.ProtocolTCP,
+									ContainerPort: 80,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	// result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
+	err := kubeClient.Create(context.TODO(), deployment)
+	if err != nil {
+		panic(err)
+	}
+	logger.Info(fmt.Sprintf("Test deployment created"))
+	// logger.Info(fmt.Sprintf("Test deployment created %s", result.GetObjectMeta().GetName()))
 	return nil
 }

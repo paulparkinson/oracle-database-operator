@@ -52,6 +52,18 @@ rules:
 - apiGroups:
   - apps
   resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
   - statefulsets
   verbs:
   - create
@@ -113,6 +125,25 @@ rules:
   - database.oracle.com
   resources:
   - autonomousdatabases/status
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - databasemetrics
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - databasemetrics/status
   verbs:
   - patch
   - update

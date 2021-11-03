@@ -1,11 +1,12 @@
 #
-# Copyright (c) 2021, Oracle and/or its affiliates. 
+# Copyright (c) 2021, Oracle and/or its affiliates.
 # Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
 #
 # This kustomization.yaml is not intended to be run by itself,
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/default
 resources:
+- bases/database.oracle.com_databasemetrics.yaml
 - bases/database.oracle.com_autonomousdatabases.yaml
 - bases/database.oracle.com_singleinstancedatabases.yaml
 - bases/database.oracle.com_shardingdatabases.yaml
