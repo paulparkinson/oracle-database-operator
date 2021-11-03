@@ -66,7 +66,7 @@ import (
 )
 
 // AutonomousDatabaseReconciler reconciles a AutonomousDatabase object
-type DatabaseMetricsReconciler struct {
+type DatabaseLogsReconciler struct {
 	KubeClient client.Client
 	Log        logr.Logger
 	Scheme     *runtime.Scheme
@@ -75,19 +75,19 @@ type DatabaseMetricsReconciler struct {
 }
 
 // SetupWithManager function
-func (r *DatabaseMetricsReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *DatabaseLogsReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&dbv1alpha1.DatabaseMetrics{}).
+		For(&dbv1alpha1.DatabaseLogs{}).
 		WithEventFilter(r.eventFilterPredicate()).
 		WithOptions(controller.Options{MaxConcurrentReconciles: 50}). // ReconcileHandler is never invoked concurrently with the same object.
 		Complete(r)
 }
 
-func (r *DatabaseMetricsReconciler) eventFilterPredicate() predicate.Predicate {
+func (r *DatabaseLogsReconciler) eventFilterPredicate() predicate.Predicate {
 	pred := predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			oldADB := e.ObjectOld.DeepCopyObject().(*dbv1alpha1.DatabaseMetrics)
-			newADB := e.ObjectNew.DeepCopyObject().(*dbv1alpha1.DatabaseMetrics)
+			oldADB := e.ObjectOld.DeepCopyObject().(*dbv1alpha1.DatabaseLogs)
+			newADB := e.ObjectNew.DeepCopyObject().(*dbv1alpha1.DatabaseLogs)
 
 			// Reconciliation should NOT happen if the lastSuccessfulSpec annotation or status.state changes.
 			oldSucSpec := oldADB.GetAnnotations()[dbv1alpha1.LastSuccessfulSpec]
@@ -112,8 +112,8 @@ func (r *DatabaseMetricsReconciler) eventFilterPredicate() predicate.Predicate {
 	return pred
 }
 
-// +kubebuilder:rbac:groups=database.oracle.com,resources=databasemetrics,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=database.oracle.com,resources=databasemetrics/status,verbs=update;patch
+// +kubebuilder:rbac:groups=database.oracle.com,resources=databaselogs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=database.oracle.com,resources=databaselogs/status,verbs=update;patch
 // +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=create;get;list;update
 // +kubebuilder:rbac:groups="",resources=configmaps;secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="apps",resources=deployments,verbs=get;list;watch;create;update;patch;delete
@@ -122,12 +122,12 @@ func (r *DatabaseMetricsReconciler) eventFilterPredicate() predicate.Predicate {
 // It go to the beggining of the reconcile if an error is returned. We won't return a error if it is related
 // to OCI, because the issues cannot be solved by re-run the reconcile.
 // Create ServiceMonitor, ConfigMap, Deployment, and Service
-func (r *DatabaseMetricsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *DatabaseLogsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.currentLogger = r.Log.WithValues("Namespaced/Name", req.NamespacedName)
-	r.currentLogger.Info("PAUL DatabaseMetricsReconciler reconcile successfully")
+	r.currentLogger.Info("PAUL DatabaseLogsReconciler reconcile successfully")
 
 	// Get the autonomousdatabase instance from the cluster
-	adb := &dbv1alpha1.DatabaseMetrics{}
+	adb := &dbv1alpha1.DatabaseLogs{}
 	if err := r.KubeClient.Get(context.TODO(), req.NamespacedName, adb); err != nil {
 		// Ignore not-found errors, since they can't be fixed by an immediate requeue.
 		// No need to change the since we don't know if we obtain the object.
@@ -141,12 +141,12 @@ func (r *DatabaseMetricsReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		Name:      "testwallet",
 	}
 
-	r.currentLogger.Info("Creating Metrics Deployment...")
+	r.currentLogger.Info("Creating Logs Deployment...")
 	// if err := adbutil.CreateTestSecret(r.currentLogger, r.KubeClient, testNamespacedName, nil); err != nil {
-	if err := adbutil.CreateMetricsDeployment(r.currentLogger, r.KubeClient, testNamespacedName, nil); err != nil {
+	if err := adbutil.CreateLogsDeployment(r.currentLogger, r.KubeClient, testNamespacedName, nil); err != nil {
 		r.currentLogger.Error(err, "Fail to create deployment")
 		return ctrl.Result{}, nil
 	}
-	r.currentLogger.Info("Finished Creating Metrics Deployment")
+	r.currentLogger.Info("Finished Creating Logs Deployment")
 	return ctrl.Result{}, nil // todo this is wrong
 }

@@ -493,7 +493,7 @@ func (r *AutonomousDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.R
 		return ctrl.Result{}, err
 	}
 
-	r.currentLogger.Info("AutonomousDatabase resoursce reconcile successfully")
+	r.currentLogger.Info("AutonomousDatabase resource reconciled successfully")
 
 	return ctrl.Result{}, nil
 }

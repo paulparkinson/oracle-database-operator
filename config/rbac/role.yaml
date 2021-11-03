@@ -131,6 +131,25 @@ rules:
 - apiGroups:
   - database.oracle.com
   resources:
+  - databaselogs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - database.oracle.com
+  resources:
+  - databaselogs/status
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - database.oracle.com
+  resources:
   - databasemetrics
   verbs:
   - create

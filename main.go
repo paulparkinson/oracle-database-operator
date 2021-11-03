@@ -90,14 +90,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&databasecontroller.DatabaseMetricsReconciler{
-		KubeClient: mgr.GetClient(),
-		Log:        ctrl.Log.WithName("controllers").WithName("database").WithName("DatabaseMetrics"),
-		Scheme:     mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "DatabaseMetrics")
-		os.Exit(1)
-	}
 	if err = (&databasecontroller.AutonomousDatabaseReconciler{
 		KubeClient: mgr.GetClient(),
 		Log:        ctrl.Log.WithName("controllers").WithName("database").WithName("AutonomousDatabase"),
@@ -123,6 +115,22 @@ func main() {
 		Recorder: mgr.GetEventRecorderFor("ShardingDatabase"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ShardingDatabase")
+		os.Exit(1)
+	}
+	if err = (&databasecontroller.DatabaseMetricsReconciler{
+		KubeClient: mgr.GetClient(),
+		Log:        ctrl.Log.WithName("controllers").WithName("database").WithName("DatabaseMetrics"),
+		Scheme:     mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "DatabaseMetrics")
+		os.Exit(1)
+	}
+	if err = (&databasecontroller.DatabaseLogsReconciler{
+		KubeClient: mgr.GetClient(),
+		Log:        ctrl.Log.WithName("controllers").WithName("database").WithName("DatabaseLogs"),
+		Scheme:     mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "DatabaseLogs")
 		os.Exit(1)
 	}
 	// Set RECONCILE_INTERVAL environment variable if you want to change the default value from 15 secs

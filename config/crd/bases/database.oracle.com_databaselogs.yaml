@@ -1,0 +1,81 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.1
+  creationTimestamp: null
+  name: databaselogs.database.oracle.com
+spec:
+  group: database.oracle.com
+  names:
+    kind: DatabaseLogs
+    listKind: DatabaseLogsList
+    plural: databaselogs
+    shortNames:
+    - dblogs
+    - databaselogs
+    singular: databaselogs
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AutonomousDatabase is the Schema for the autonomousdatabases
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: 'AutonomousDatabaseSpec defines the desired state of AutonomousDatabase
+              Important: Run "make" to regenerate code after modifying this file'
+            properties:
+              details:
+                description: "type OCIConfigSpec struct { \tConfigMapName *string
+                  `json:\"configMapName,omitempty\"` \tSecretName    *string `json:\"secretName,omitempty\"`
+                  } \n // AutonomousDatabaseDetails defines the detail information
+                  of AutonomousDatabase, corresponding to oci-go-sdk/database/AutonomousDatabase"
+                properties:
+                  dbName:
+                    description: AutonomousDatabaseOCID *string `json:"autonomousDatabaseOCID,omitempty"`
+                      CompartmentOCID        *string `json:"compartmentOCID,omitempty"`
+                      DisplayName            *string `json:"displayName,omitempty"`
+                    type: string
+                type: object
+              hardLink:
+                description: OCIConfig OCIConfigSpec             `json:"ociConfig,omitempty"`
+                type: boolean
+            required:
+            - details
+            type: object
+          status:
+            description: AutonomousDatabaseStatus defines the observed state of AutonomousDatabase
+            properties:
+              displayName:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
